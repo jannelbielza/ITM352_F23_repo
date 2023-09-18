@@ -1,0 +1,40 @@
+body {
+  color: yellow;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left: 50px;
+  margin-right: 50px;
+  width: 950px;
+  background-color: black;
+}
+
+h1 {
+  font-family: 'Oswald', sans-serif;
+}
+
+h2 {
+  font-family: 'Oswald', sans-serif;
+}
+
+p {
+  font-family: 'Open Sans', sans-serif;
+}
+
+ul li {
+  list-style-type: none;
+  display: inline;
+  width: 300px;
+  margin: 0;
+  padding: 0 70px;
+}
+
+.column {
+  float: left;
+  width: 33.33%;
+}
+
+.row:after {
+  content: "";
+  display:table;
+  clear: both;
+}
