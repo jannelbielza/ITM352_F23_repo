@@ -1,5 +1,5 @@
 //define store name and push it to the DOM in the top title
-const store_name="Sal";
+const store_name="Jannel";
 top_title.innerHTML=(store_name + "'s Used Smart Phone Store");
 
 //send store name info to the footer title
@@ -22,10 +22,9 @@ function changeClassName(element) {
         
     //spins=spins+1; 
     if(spins<2*hits&&hits<spins){
-        //wins=true;
-        over_half=true;
+        wins=true;
     } else {
-        //wins=false;
+        wins=false;
     }
     //win_span.innerHTML=wins;
     win_span.innerHTML=over_half;
