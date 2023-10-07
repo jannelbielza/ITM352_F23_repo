@@ -110,10 +110,26 @@ for (let i = 1; i <= num_products; i++){
 //exercise 3.1b
 console.log();
 console.log("exercise 3.1b");
-for (let i = 1; eval("typeof name" + i) != 'undefined'; i++){
+for (let i = 1; eval("typeof name" + i) != 'undefined'; i++){ // adding the eval function. 
     if (i >= lowerBound && i <= upperBound) {
         console.log(eval('name' + i) + ' is sold out!');
     }else {
         console.log(i + '. ' +eval('name' + i));
     }
 }
+
+//exercise 4.2: 
+console.log();
+console.log("exercise4.2");
+
+//Create a table header
+document.write('<table border ="1"');
+document.write('<tr><th>Number</th><th>Item</th></tr>');
+
+// loop to output 
+for (let i = 1; eval("typeof name"+i) != 'undefined'; i++) {
+    document.write(`<tr><td>${i}</td><td>${eval("name"+i )}</td></tr>`);
+}
+
+//close the table
+document.write('</table>');
