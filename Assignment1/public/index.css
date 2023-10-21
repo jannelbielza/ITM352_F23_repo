@@ -1,0 +1,98 @@
+.navbar {
+    display: flex;
+    align-items: left;
+    background-color: white;
+    color: #fff;
+    padding: 10px;
+    top: 0;
+}
+
+.navbar .button{
+    margin-right: 20px;
+    font-size: 12px;
+    display: block;
+    background-color: #BF0D3E;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Montserrat', sans-serif;    
+    font-size: 17px;
+    padding: 10px 20px;
+    width: auto;
+    height: 20px;
+    text-decoration: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.navbar .button:hover{
+    background-color: #0032A0;
+}
+
+
+img {
+    border: 1px solid #ffffff;
+    /* Gray border */
+    border-radius: 4px;
+    /* Rounded border */
+    padding: 5px;
+    /* Some padding */
+    width: 550px;
+    /* Set a small width */
+    animation: rotation 4s infinite linear;
+    /* sets animation to rotate 350*/
+    
+}
+
+.rotate {
+    animation: rotation 4s infinite linear;
+}
+
+@keyframes rotation {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(359deg);
+    }
+}
+
+body {
+    text-align: center;
+    background: white;
+}
+
+h1{
+    font-family: 'Palanquin-Dark', sans-serif;
+    font-size: 50px;
+    margin-top: 20px;
+    margin-bottom: -10px;
+    background-color: white;
+    padding-bottom: 1px;
+    padding-top: 1px;
+    color: #0032A0;
+    justify-items: center;
+    height: 110px;
+}
+
+h2{
+    font-family: 'Montserrat', sans serif;
+    font-size: 20px;
+    margin-top: 40px;
+    color: #0032A0;;
+}
+
+/* body styling */
+body {
+    text-align: center;
+    background: white;
+    margin: 0;
+    padding: 0;
+}
+
+.image {
+    justify-content: center;
+    align-items: center;
+    height: 20%; 
+    width: 20%;
+}
