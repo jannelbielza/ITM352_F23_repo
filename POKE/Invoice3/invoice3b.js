@@ -66,7 +66,7 @@ function generateItemRows() {
   
       // If there are validation errors, display the item with an error message
       if (validationMessage !== "") {
-        hasErrors = true;
+        let hasErrors = true;
         let row = table.insertRow();
         row.insertCell(0).innerHTML = item.brand;
         row.insertCell(1).innerHTML = validationMessage;
