@@ -31,7 +31,7 @@
     },
     {
       "name": "Jolibee Peach Mango Pie",
-      "price": 3.99,
+      "price": 10.00,
       "image": "./images/peach.png",
       "quantity_available": 3
     }
