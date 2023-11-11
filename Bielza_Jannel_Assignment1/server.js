@@ -15,23 +15,21 @@ app.get("/products.js", function (request, response, next) {
 
 app.use(express.urlencoded({ extended: true }));
 
-//** Work in progress **/
+//** Work in progress **/ //from lab12 
 app.post("/process_form", function (request, response) {
         //response.send(request.body); 
+
     let q = Number(request.body['qty_textbox']);
     console.log("the input value is..."+q);
 
-    //products[0].total_sold +=q; //only done on server side
 
     let validationMessage = validateQuantity(q);
 
     if (validationMessage == "") {
-        //response.send(`<h2>Thank you for purchasing ${q} ${brand}. Your total is \$${q * brand_price}!</h2>`);
+        
         response.redirect('invoice.html?quantity=' + q);//part 5 redirect
     } else {
-        //response.send(validationMessage+'<br>'+`Error: ${q} is not a quantity. Hit the back button to fix.`);
-        //response.redirect('receipt.html?quantity=' + q);//part 5 redirect
-        // Redirect back to order.html with the error in the query string
+       
         response.redirect(`products_display.html?error=${validationMessage}&qty_textbox=${q}`); // final part of part 5
     }
 });
