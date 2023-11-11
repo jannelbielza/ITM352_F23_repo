@@ -1,12 +1,7 @@
-let express = require('express');
-let app = express();
+const express = require('express');
+const app = express();
 
 app.use(express.static(__dirname + '/public'));
-
-app.get('/test', function (req, res) {
-    res.send('app.get for test was executed');
-    console.log('app.get for test was executed'); 
-}); 
 
 let products = require(__dirname + '/products.json');
 products.forEach( (prod,i) => {prod.total_sold = 0});
@@ -20,33 +15,31 @@ app.get("/products.js", function (request, response, next) {
 
 app.use(express.urlencoded({ extended: true }));
 
+//** Work in progress **/
 app.post("/process_form", function (request, response) {
-    let receipt = '';
-    let qtys = request.body[`quantity_textbox`];
-    console.log(qtys);
-    for (let i in qtys) {
-        let q = Number(qtys[i]);
-        console.log("the quantity value is "+q);
-        let validationMessage = validateQuantity(q);
-        let brand = products[i]['brand'];
-        let brand_price = products[i]['price'];
-        if (validateQuantity(q)==="") {
-            products[i]['total_sold'] += Number(q);
-            receipt += `<h3>Thank you for purchasing: ${q} ${brand}. Your total is \$${q * brand_price}!</h3>`; // render template string
-        } else {
-            receipt += `<h3><font color="red">${q} is not a valid quantity for ${brand}!<br>${validationMessage}</font></h3>`;
-        }
+        //response.send(request.body); 
+    let q = Number(request.body['qty_textbox']);
+    console.log("the input value is..."+q);
+
+    //products[0].total_sold +=q; //only done on server side
+
+    let validationMessage = validateQuantity(q);
+
+    if (validationMessage == "") {
+        //response.send(`<h2>Thank you for purchasing ${q} ${brand}. Your total is \$${q * brand_price}!</h2>`);
+        response.redirect('invoice.html?quantity=' + q);//part 5 redirect
+    } else {
+        //response.send(validationMessage+'<br>'+`Error: ${q} is not a quantity. Hit the back button to fix.`);
+        //response.redirect('receipt.html?quantity=' + q);//part 5 redirect
+        // Redirect back to order.html with the error in the query string
+        response.redirect(`products_display.html?error=${validationMessage}&qty_textbox=${q}`); // final part of part 5
     }
-    response.send(receipt);
-    response.end();
-
 });
 
-app.all('*', function (request, response, next) {
-    //response.send(request.method + ' to path ' + request.path);
-    console.log(request.method + ' to path ' + request.path);
-});
-
+ app.all('*', function (request, response, next) {
+    console.log(request.method + ' to ' + request.path);
+    next();
+ });
 
 app.listen(8080, () => console.log(`listening on port 8080`)); // note the use of an anonymous function here to do a callback
 
