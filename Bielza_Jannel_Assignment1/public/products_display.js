@@ -1,13 +1,21 @@
 window.onload = function () {
-    // Check the URL for any error parameters and quantity and display/use them
     let params = (new URL(document.location)).searchParams;
-    let q = Number(params.get('quantity'));
     let error = params.get('error');
 
-    //if there is an error, alert the user
+    // If there is an error, alert the user
     if (error) {
-        alert(error);
+        document.getElementById("errorMessage").innerText = error;
     }
+
+    // Loop through products to populate quantity textboxes
+    for (let i in products) {
+        let qtyParam = params.get(`Quantity${i}`);
+        if (qtyParam !== null) {
+            document.getElementById(`quantity_textbox${i}`).value = qtyParam;
+            checkQuantityTextbox(document.getElementById(`quantity_textbox${i}`));
+        }
+    }
+
     const form = document.getElementById('productForm');
     let formHTML = '';
 
@@ -18,20 +26,21 @@ window.onload = function () {
         }
 
         formHTML += `
-        <div class="col-sm-4">
-            <div class="card h-100">
-                <img class="card-img-top" src="${products[i]["image"]}" alt="Card image">
-                <div class="card-body">
-                    <h4 class="card-title">${products[i]["name"]}</h4>
-                    <p class="card-text">\$${products[i]["price"]}</p>
-                    <p>Enter Quantity:</p>
-                    <p>(${products[i]["total_sold"]} sold)</p>
-                    <input type="text" id="quantity_textbox_${i}" name="quantity_textbox[${i}]" onkeyup="checkQuantityTextbox(this);">
-                    <span id="quantity_textbox[${i}]_message">Enter a quantity</span><br>
-                    
-                </div>
+    <div class="col-sm-4">
+        <div class="card h-100">
+            <img class="card-img-top" src="${products[i]["image"]}" alt="Card image">
+            <div class="card-body">
+                <h4 class="card-title">${products[i]["name"]}</h4>
+                <p class="card-text">\$${products[i]["price"]}</p>
+                <p> ${products[i]["quantity_available"]} in stock!</p>
+                <p>(${products[i]["total_sold"]} sold)</p>
+                <label id="quantity_textbox${i}_label">Quantity</label><br>
+                <input type="text" id="quantity_textbox${i}" name="quantity_textbox${i}" placeholder='0' onkeyup="checkQuantityTextbox(this);">
+                <button type="button" onclick="incrementQuantity(${i})">+</button>
+                <button type="button" onclick="decrementQuantity(${i})">-</button>
             </div>
-        </div>`;
+        </div>
+    </div>`;
 
         if (i % 3 === 2 || i == products.length - 1) {
             // End the row for every third index or the last item
@@ -41,44 +50,68 @@ window.onload = function () {
     }
         // Add the "Purchase" button
         formHTML += `
-        <br>
-            <div class="d-flex justify-content-center mt-4">
-                <input type="submit" value="Purchase" class="btn btn-primary btn-lg btn-dark">
-            </div>
+        <footer>
+            <input type="submit" value="Purchase" class="btn btn-primary btn-lg btn-dark">
             <br>
-            <br>`;
+            <br>
+        </footer>    
+            `;
 
     // Push the form content to the DOM
     form.innerHTML = formHTML;
 }
-
-function checkQuantityTextbox(theTextbox) {
-    let errs = validateQuantity(theTextbox.value);
-    document.getElementById(theTextbox.name + '_message').innerHTML = errs.join(", ");
-}
-
-//add the validateQuantity()
-function validateQuantity(quantity) {
-    let errorMessage = "";
-
-    switch (true) {
-        case isNaN(quantity):
-            errorMessage = "Not a number. Please enter a non-negative quantity to order.";
-            break;
-        case quantity < 0 && !Number.isInteger(quantity):
-            errorMessage = "Negative inventory and not an Integer. Please enter a non-negative quantity to order.";
-            break;
-        case quantity < 0:
-            errorMessage = "Negative inventory. Please enter a non-negative quantity to order.";
-            break;
-        case !Number.isInteger(quantity):
-            errorMessage = "Not an Integer. Please enter a non-negative quantity to order.";
-            break;
-        default:
-            errorMessage = ""; // No errors
-            break;
+//add the isNonNegInt()
+function isNonNegInt(stringValue, returnErrors = false) {
+    errors = []; // assume no errors at first
+    if (Number(stringValue) != stringValue) errors.push('<font color="red">Not a number!</font>'); // Check if string is a number value
+    else {
+        if (stringValue < 0) errors.push('<font color="red">Quantity cannot be a negative!</font>');
+        // Checking if input is an integer; // Check if it is non-negative
+        if (parseInt(stringValue) != stringValue) errors.push('<font color="red">Not an integer!</font>'); // Check that it is an integer
+        if ((parseInt(stringValue) == stringValue) && (stringValue >= 0)) { // Check that it is a positive integer
+            // Products array for loop
+            for (let i = 0; i < products.length; i++) {
+                // ID 'qtyin' becomes let inputval
+                let inputVal = document.getElementById(`quantity_textbox${i}`).value;
+            
+                if ((inputVal > 0) && (inputVal > products[i].quantity_available)) {
+                    // If it does exceed push error message
+                    errors.push(`We do not have ${stringValue} available.`);
+                    // Input and Quantity Available are then calculated to determine if it is in the range of quantity available
+                    // Reduce the input to the quantity available (replace the input)
+                    let extraval = stringValue - products[i].quantity_available;
+                    document.getElementById(`quantity_textbox${i}`).value = stringValue - extraval;
+                    // Displays the quantity label in red font
+                    document.getElementById(`quantity_textbox${i}_label`).style.color = "red";
+                }
+            }
+        }
     }
-
-    return errorMessage;
+    return (returnErrors ? errors : (errors.length == 0));
+};
+function checkQuantityTextbox(product_quantities_array) { 
+    errs = isNonNegInt(product_quantities_array.value, true); //valid
+    if (errs.length == 0) errs = ['You want:']; //when typing in the textbox, this will display 
+    if (product_quantities_array.value.trim() == '') errs = ['Quantity:'];
+    document.getElementById(product_quantities_array.name + '_label').innerHTML = errs.join(", ");
 }
+
+
+// increment quantity
+function incrementQuantity(index) {
+    let quantityTextbox = document.getElementById(`quantity_textbox${index}`);
+    let currentQuantity = parseInt(quantityTextbox.value) || 0;
+    quantityTextbox.value = currentQuantity + 1;
+    checkQuantityTextbox(quantityTextbox);
+}
+// decrement quantity
+function decrementQuantity(index) {
+    let quantityTextbox = document.getElementById(`quantity_textbox${index}`);
+    let currentQuantity = parseInt(quantityTextbox.value) || 0;
+    quantityTextbox.value = currentQuantity - 1;
+    checkQuantityTextbox(quantityTextbox);
+}
+
+
+
 

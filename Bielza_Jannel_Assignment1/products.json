@@ -3,36 +3,36 @@
       "name": "Salt & Vinegar Cracklings",
       "price": 2.99,
       "image": "./images/cracklings.png",
-      "quantity_available": 10
+      "quantity_available": 50
     },
     {
       "name": "Fudgee Barr Chocolate Bars",
       "price": 8.00,
       "image": "./images/fudge.png",
-      "quantity_available": 15
+      "quantity_available": 50
     },
     {
       "name": "Philippine Brand: Dried Mangoes",
       "price": 4.29,
       "image": "./images/mangos.png",
-      "quantity_available": 4
+      "quantity_available": 50
     },
     {
       "name": "Piattos Cheese Chips",
-      "price": 1.00,
+      "price": 2.00,
       "image": "./images/piattos.png",
-      "quantity_available": 15
+      "quantity_available": 50
     },
     {
       "name": "Vcut Potato Chips",
-      "price": 1.00,
+      "price": 2.00,
       "image": "./images/vcut.png",
-      "quantity_available": 7
+      "quantity_available": 50
     },
     {
       "name": "Jolibee Peach Mango Pie",
       "price": 10.00,
       "image": "./images/peach.png",
-      "quantity_available": 3
+      "quantity_available": 10
     }
   ]
