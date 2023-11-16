@@ -1,17 +1,14 @@
 window.onload = function () {
     let params = (new URL(document.location)).searchParams;
-    let error = params.get('error');
 
-    // If there is an error, alert the user
-    if (error) {
-        document.getElementById("errorMessage").innerText = error;
-    }
-
-    // Loop through products to populate quantity textboxes
-    for (let i in products) {
-        let qtyParam = params.get(`Quantity${i}`);
-        if (qtyParam !== null) {
-            document.getElementById(`quantity_textbox${i}`).value = qtyParam;
+    // URL contains 'textError' means that there is either a negative, non-integer, or a letter 
+    if (params.has('error')) {
+        // Generates an alert with the value textError, Alert says "Please enter a valid quantity"
+        alert(params.get('error'));
+        for (let i in products) {
+            // put quantity in query string back in quantity textbox
+            document.getElementById(`quantity_textbox${i}`).value = params.get(`Quantity${i}`);
+            // check the quantity in the textbox
             checkQuantityTextbox(document.getElementById(`quantity_textbox${i}`));
         }
     }
@@ -71,21 +68,26 @@ function isNonNegInt(stringValue, returnErrors = false) {
         if ((parseInt(stringValue) == stringValue) && (stringValue >= 0)) { // Check that it is a positive integer
             // Products array for loop
             for (let i = 0; i < products.length; i++) {
-                // ID 'qtyin' becomes let inputval
-                let inputVal = document.getElementById(`quantity_textbox${i}`).value;
+                // ID 'quantity_textbox' becomes let inputval
+                let quantityTextbox = document.getElementById(`quantity_textbox${i}`);
+                
+                // Check if the element is found before accessing its value property
+                if (quantityTextbox) {
+                    let inputVal = quantityTextbox.value;
             
-                if ((inputVal > 0) && (inputVal > products[i].quantity_available)) {
-                    // If it does exceed push error message
-                    errors.push(`We do not have ${stringValue} available.`);
-                    // Input and Quantity Available are then calculated to determine if it is in the range of quantity available
-                    // Reduce the input to the quantity available (replace the input)
-                    let extraval = stringValue - products[i].quantity_available;
-                    document.getElementById(`quantity_textbox${i}`).value = stringValue - extraval;
-                    // Displays the quantity label in red font
-                    document.getElementById(`quantity_textbox${i}_label`).style.color = "red";
+                    if ((inputVal > 0) && (inputVal > products[i].quantity_available)) {
+                        // If it does exceed, push an error message
+                        errors.push(`We do not have ${inputVal} available.`);
+                        // Input and Quantity Available are then calculated to determine if it is in the range of quantity available
+                        // Reduce the input to the quantity available (replace the input)
+                        let extraval = inputVal - products[i].quantity_available;
+                        quantityTextbox.value = inputVal - extraval;
+                        // Displays the quantity label in red font
+                        document.getElementById(`quantity_textbox${i}_label`).style.color = "red";
+                    }
                 }
             }
-        }
+        }            
     }
     return (returnErrors ? errors : (errors.length == 0));
 };
