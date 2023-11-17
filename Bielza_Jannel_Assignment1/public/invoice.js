@@ -1,11 +1,11 @@
-// initializes variables
+// These variables are used to store various values related to pricing and totals.
 let extendedPrices = [];
 let extendedPrice = 0;
 let subtotal = 0;
 let taxAmount = 0;
 let shipping = 0;
 
-// opens the URL params
+// It extracts product quantities from the URL parameters and populates the quantities array. If a quantity is not a valid number, it defaults to 0.
 let quantities = [];
 let params = (new URL(document.location)).searchParams;
 for (let i in products) {
@@ -15,9 +15,11 @@ console.log(quantities);
 console.log(params.get(`prod0`));
 
 
-// generate all the item rows
+// Calls a function (generateItemRows()) to create rows in an invoice table based on the product information and quantities.
 generateItemRows();
 
+
+// Calculates tax, determines shipping costs based on the subtotal, and calculates the total amount.
 // calculate subtotal
 // calculate tax
 let tax = (subtotal * 0.0575);
@@ -34,14 +36,13 @@ if (subtotal <= 50) {
 // calculates total
 let total = tax + subtotal + shipping;
 
-// insert footer row values
+//Updates HTML elements with the calculated subtotal, tax, shipping, and total values.
 document.getElementById("subtotal_cell").innerHTML = "$" + subtotal.toFixed(2);
 document.getElementById("tax_cell").innerHTML = "$" + tax.toFixed(2);
 document.getElementById("shipping_cell").innerHTML = "$" + shipping.toFixed(2);
 document.getElementById("total_cell").innerHTML = "$" + total.toFixed(2);
 
-// function to validate the quantity, returns a string if not a number, negative, not an integer, or a combination of both
-// if no errors in quantity, returns an empty string
+//Defines a function to validate quantity input, checking if it's a positive integer and displaying appropriate error messages.
 function validateQuantity(quantity) {
     if (isNaN(quantity)) {
         return "Please Enter a Number";
@@ -56,7 +57,7 @@ function validateQuantity(quantity) {
     }
 }
 
-// generate all the item rows
+//Creates rows in an invoice table based on product information, handling validation and updating subtotal accordingly.
 function generateItemRows() {
     // sets table to the invoice table on the HTML
     let table = document.getElementById("invoiceTable");
@@ -91,11 +92,13 @@ function generateItemRows() {
     });
 }
 
+//Functions responsible for creating table rows, either for valid items or for displaying errors.
 function createErrorRow(row, itemName, errorMessage) {
     row.insertCell(0).innerHTML = `<img src="${itemName}" class="img-small" name="img">`;
     row.insertCell(1).innerHTML = errorMessage;
 }
 
+// Functions responsible for creating table rows, either for valid items or for displaying errors.
 function createItemRow(row, products, quantity, extendedPrice) {
     row.insertCell(0).innerHTML = `<img src="${products.image}" class="img-small" name="img">`;
     row.insertCell(1).innerHTML = products.name;
@@ -104,6 +107,7 @@ function createItemRow(row, products, quantity, extendedPrice) {
     row.insertCell(4).innerHTML = "$" + extendedPrice.toFixed(2);
 }
 
+//  function to calculate the extended price (price * quantity).
 function calculateExtendedPrice(price, quantity) {
     return price * quantity;
 }
