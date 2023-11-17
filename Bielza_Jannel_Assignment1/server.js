@@ -1,78 +1,121 @@
+// Importing the Express.js framework 
 const express = require('express');
+// Create an instance of the Express application called "app"
+// app will be used to define routes, handle requests, etc
 const app = express();
-const qs = require("querystring");
-
-app.use(express.static(__dirname + '/public'));
 
 app.use(express.urlencoded({ extended: true }));
 
+//grabs everything from public
+app.use(express.static(__dirname + '/public'));
+
+//sets up the product array from the json file
+let products = require(__dirname + '/products.json');
+products.forEach( (prod,i) => {prod.total_sold = 0});
+
+// Define a route for handling a GET request to a path that matches "./products.js"
 app.get("/products.js", function (request, response, next) {
-   response.type('.js');
-   let products_str = `let products = ${JSON.stringify(products)};`;
-   response.send(products_str);
+    response.type('.js');
+    let products_str = `var products = ${JSON.stringify(products)};`;
+    //console.log(products_str);
+    response.send(products_str);
 });
+
+
+//whenever a post with proccess form is recieved
+app.post("/process_form", function (request, response) {
+
+    //get the textbox inputs in an array
+    let qtys = request.body[`quantity_textbox`];
+    //initially set the valid check to true
+    let valid = true;
+    //instantiate an empty string to hold the url
+    let url = '';
+    let soldArray =[];
+
+    //for each member of qtys
+    for (i in qtys) {
+        
+        //set q as the number
+        let q = Number(qtys[i]);
+        
+        //console.log(validateQuantity(q));
+        //if the validate quantity string is empty
+        if (validateQuantity(q)=='') {
+            //check if we will go into the negative if we buy this, set valid to false if so
+            if (products[i]['quantity_available'] - Number(q) < 0) {
+                valid = false;
+                url += `&prod${i}=${q}`
+            }
+            // otherwise, add to total sold, and subtract from available
+            else{
+               
+                soldArray[i] = Number(q);
+                
+                //add argument to url
+                url += `&prod${i}=${q}`
+            }
+            
+            
+        }
+        //if the validate quantity string has stuff in it, set valid to false
+         else {
+            
+            valid = false;
+            url += `&prod${i}=${q}`
+        }
+        //check if no products were bought, set valid to false if so
+        if(url == `&prod0=0&prod1=0&prod2=0&prod3=0&prod4=0&prod5=0`){
+            valid = false
+        }
+    }
+    //if its false, return to the store with error=true
+    if(valid == false)
+    {
+       
+        response.redirect(`products_display.html?error=true` + url);
+        
+        
+    }
+    //otherwise, redirect to the invoice with the url attached
+    else{
+
+         for (i in qtys)
+        {
+            //update total and qty only if everything is good
+            products[i]['total_sold'] += soldArray[i];
+            products[i]['quantity_available'] -= soldArray[i];
+        }
+        
+        response.redirect('invoice.html?' + url);
+        
+    }
+ });
+
+// Route all other GET requests to serve static files from a directory named "public"
 
 app.all('*', function (request, response, next) {
-   console.log(request.method + ' to ' + request.path);
-   next();
-});
+    //console.log(request.method + ' to ' + request.path);
+    next();
+ });
 
-const products = require(__dirname + '/products.json');
-for (let i in products) {
-   products.forEach((prod, i) => { prod.total_sold = 0 });
-}
+// Start the server; listen on port 8080 for incoming HTTP requests
+app.listen(8080, () => console.log(`listening on port 8080`));
 
+//function to validate the quantity, returns a string if not a number, negative, not an integer, or a combination of both
+//if no errors in quantity, returns empty string
+function validateQuantity(quantity){
+    //console.log(quantity);
+    if(isNaN(quantity)){
+        return "Not a Number";
+    }else if (quantity<0 && !Number.isInteger(quantity)){
+        return "Negative Inventory & Not an Integer";
+    }else if (quantity <0){
+        return "Negative Inventory";
+    }else if(!Number.isInteger(quantity)){
+        return "Not an Integer";
+    }else{
+        return"";
+    }
 
-//** Work in progress **/ 
-app.post('/process_form', function (request, response) {
-   console.log(request.body);
-   //Check if the quantities are valid
-   let haserrors = false;
-   let hasquantities = false;
-
-
-   for (let i in products) {
-      let q = request.body["Quantity" + i];
-
-      //Check if quantity > 0
-      hasquantities = hasquantities || (q > 0);
-
-      //Check if q is a NonNegInt
-      haserrors = haserrors || (isNonNegInt(q) == false);
-
-      //Check if quantites asked for are available
-      haserrors = haserrors || (q > products[i].quantity_available);
-
-   }
-
-   if (!haserrors) {
-      if (hasquantities == true) {
-         //Will direct user to login if quantity input is valid 
-         //Remove item sold from inventory
-         for (let i in products) {
-            let q = request.body["Quantity" + i];
-            let remainder = products[i].quantity_available;
-            products[i].quantity_available = remainder - Number(q);
-         }
-         response.redirect("./invoice.html?" + qs.stringify(request.body));
-      } else {
-         //User will be kept on the page if the input is invalid
-         response.redirect("./products_display.html?" + qs.stringify(request.body) + `&error=Please select some items`);
-      }
-   }
-
-});
-
-app.listen(8080, () => console.log(`listening on port 8080`)); // note the use of an anonymous function here to do a callback
-
-function isNonNegInt(stringValue, returnErrors = false) {
-   let errors = []; // assume no errors at first
-   if (stringValue == "") {
-      stringValue = 0;
-   } // empty string = 0
-   if (Number(stringValue) != stringValue) errors.push('Not a number!'); // Check if string is a number value
-   if (stringValue < 0) errors.push('Negative value!'); // Check if it is non-negative
-   if (parseInt(stringValue) != stringValue) errors.push('Not an integer!'); // Check that it is an integer
-
-   return (returnErrors ? errors : (errors.length == 0));
 }
