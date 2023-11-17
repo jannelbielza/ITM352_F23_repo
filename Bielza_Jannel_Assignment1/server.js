@@ -45,8 +45,6 @@ app.post('/process_form', function (request, response) {
 
    }
 
-
-   //Code taken from Lab 12 Ex5
    if (!haserrors) {
       if (hasquantities == true) {
          //Will direct user to login if quantity input is valid 
