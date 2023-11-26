@@ -1,0 +1,17 @@
+.card-body button {
+    background-color: blue; /* Green background color */
+    color: #fff; /* White text color */
+    border: none; /* Remove border */
+    padding: 8px 12px; /* Add padding */
+    cursor: pointer; /* Add a pointer cursor */
+    margin: 5px; /* Add margin for spacing */
+    border-radius: 4px; /* Add rounded corners */
+}
+
+.card-body button:hover {
+    background-color: whitesmoke; /* Darker green color on hover */
+}
+
+.card-body button:active {
+    background-color: whitesmoke; /* Even darker green color on click */
+}

@@ -21,76 +21,49 @@ app.get("/products.js", function (request, response, next) {
     response.send(products_str);
 });
 
-
-//whenever a post with proccess form is recieved
+// Handle POST request to "/process_form"
 app.post("/process_form", function (request, response) {
-
-    //get the textbox inputs in an array
-    let qtys = request.body[`quantity_textbox`];
-    //initially set the valid check to true
-    let valid = true;
-    //instantiate an empty string to hold the url
+    // Extract quantity data from the request body
+    let quantity_text = request.body.quantity_textbox;
+    
+    // Initialize variables for URL parameters and an array to store sold quantities
     let url = '';
-    let soldArray =[];
+    let soldArray = [];
 
-    //for each member of qtys
-    for (i in qtys) {
-        
-        //set q as the number
-        let q = Number(qtys[i]);
-        
-        //console.log(validateQuantity(q));
-        //if the validate quantity string is empty
-        if (validateQuantity(q)=='') {
-            //check if we will go into the negative if we buy this, set valid to false if so
-            if (products[i]['quantity_available'] - Number(q) < 0) {
-                valid = false;
-                url += `&prod${i}=${q}`
-            }
-            // otherwise, add to total sold, and subtract from available
-            else{
-               
-                soldArray[i] = Number(q);
-                
-                //add argument to url
-                url += `&prod${i}=${q}`
-            }
-            
-            
-        }
-        //if the validate quantity string has stuff in it, set valid to false
-         else {
-            
-            valid = false;
-            url += `&prod${i}=${q}`
-        }
-        //check if no products were bought, set valid to false if so
-        if(url == `&prod0=0&prod1=0&prod2=0&prod3=0&prod4=0&prod5=0`){
-            valid = false
-        }
-    }
-    //if its false, return to the store with error=true
-    if(valid == false)
-    {
-       
-        response.redirect(`products_display.html?error=true` + url);
-        
-        
-    }
-    //otherwise, redirect to the invoice with the url attached
-    else{
+    // Iterate through each quantity in the form
+    for (let i = 0; i < quantity_text.length; i++) {
+        // Convert quantity to a number
+        let q = Number(quantity_text[i]);
 
-         for (i in qtys)
-        {
-            //update total and qty only if everything is good
-            products[i]['total_sold'] += soldArray[i];
-            products[i]['quantity_available'] -= soldArray[i];
+        // Validate the quantity using a custom function
+        let validationMessage = validateQuantity(q);
+
+        // Check if the quantity is valid and available in stock
+        if (validationMessage === '' && products[i].quantity_available - q >= 0) {
+            // Store the sold quantity and update the URL parameter string
+            soldArray[i] = q;
+            url += `&prod${i}=${q}`;
+        } else {
+            // If invalid or insufficient stock, include the quantity in the URL for error reporting
+            url += `&prod${i}=${q}`;
         }
-        
-        response.redirect('invoice.html?' + url);
-        
+        // Check if all quantities are zero, indicating an error, and redirect with an error message
+        if (url === `&prod0=0&prod1=0&prod2=0&prod3=0&prod4=0&prod5=0`) {
+            response.redirect(`products_display.html?error=true${url}`);
+            return;
+        }
     }
- });
+
+    // Update product quantities and total sold based on the soldArray
+    for (let i = 0; i < quantity_text.length; i++) {
+        products[i].total_sold += soldArray[i];
+        products[i].quantity_available -= soldArray[i];
+    }
+
+    // Redirect to the invoice page with the updated URL parameters
+    response.redirect(`invoice.html?${url}`);
+});
+
 
 // Route all other GET requests to serve static files from a directory named "public"
 
